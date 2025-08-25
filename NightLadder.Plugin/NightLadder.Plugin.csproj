@@ -1,0 +1,141 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>NightLadder.Plugin</AssemblyName>
+    <InteropDir>C:\Users\Felipe\source\repos\interop</InteropDir>
+    <CoreDir>C:\Users\Felipe\source\repos\core</CoreDir>
+    <DllsDir>C:\Users\Felipe\source\repos\dlls</DllsDir>
+    <DeployDir>$(NIGHTLADDER_DEPLOY_DIR)</DeployDir>
+  </PropertyGroup>
+
+  <!-- Flags to detect presence of external game/modding DLLs so we can build even without them -->
+  <PropertyGroup>
+    <HasBepInEx Condition="Exists('$(CoreDir)\BepInEx.Core.dll')">true</HasBepInEx>
+    <HasInterop Condition="Exists('$(InteropDir)\Unity.Entities.dll')">true</HasInterop>
+    <HasVCF Condition="Exists('$(DllsDir)\VampireCommandFramework.dll')">true</HasVCF>
+    <HasCodeGen Condition="Exists('$(InteropDir)\ProjectM.CodeGeneration.dll')">true</HasCodeGen>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NightLadder.Core\NightLadder.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Referências do BepInEx/IL2CPP -->
+  <ItemGroup>
+    <Reference Include="BepInEx.Core" Condition="Exists('$(CoreDir)\BepInEx.Core.dll')">
+      <HintPath>$(CoreDir)\BepInEx.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.Common" Condition="Exists('$(CoreDir)\BepInEx.Unity.Common.dll')">
+      <HintPath>$(CoreDir)\BepInEx.Unity.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP" Condition="Exists('$(CoreDir)\BepInEx.Unity.IL2CPP.dll')">
+      <HintPath>$(CoreDir)\BepInEx.Unity.IL2CPP.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime" Condition="Exists('$(CoreDir)\Il2CppInterop.Runtime.dll')">
+      <HintPath>$(CoreDir)\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Common" Condition="Exists('$(CoreDir)\Il2CppInterop.Common.dll')">
+      <HintPath>$(CoreDir)\Il2CppInterop.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.HarmonySupport" Condition="Exists('$(CoreDir)\Il2CppInterop.HarmonySupport.dll')">
+      <HintPath>$(CoreDir)\Il2CppInterop.HarmonySupport.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib" Condition="Exists('$(InteropDir)\Il2Cppmscorlib.dll')">
+      <HintPath>$(InteropDir)\Il2Cppmscorlib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony" Condition="Exists('$(CoreDir)\0Harmony.dll')">
+      <HintPath>$(CoreDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Referências Unity/VRising (condicionais) -->
+  <ItemGroup>
+    <Reference Include="UnityEngine.CoreModule" Condition="Exists('$(InteropDir)\UnityEngine.CoreModule.dll')">
+      <HintPath>$(InteropDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine" Condition="Exists('$(InteropDir)\UnityEngine.dll')">
+      <HintPath>$(InteropDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Collections" Condition="Exists('$(InteropDir)\Unity.Collections.dll')">
+      <HintPath>$(InteropDir)\Unity.Collections.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Entities" Condition="Exists('$(InteropDir)\Unity.Entities.dll')">
+      <HintPath>$(InteropDir)\Unity.Entities.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp" Condition="Exists('$(InteropDir)\Assembly-CSharp.dll')">
+      <HintPath>$(InteropDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ProjectM" Condition="Exists('$(InteropDir)\ProjectM.dll')">
+      <HintPath>$(InteropDir)\ProjectM.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ProjectM.Network" Condition="Exists('$(InteropDir)\ProjectM.Network.dll')">
+      <HintPath>$(InteropDir)\ProjectM.Network.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ProjectM.Shared" Condition="Exists('$(InteropDir)\ProjectM.Shared.dll')">
+      <HintPath>$(InteropDir)\ProjectM.Shared.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ProjectM.Gameplay.Systems" Condition="Exists('$(InteropDir)\ProjectM.Gameplay.Systems.dll')">
+      <HintPath>$(InteropDir)\ProjectM.Gameplay.Systems.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ProjectM.CodeGeneration" Condition="Exists('$(InteropDir)\ProjectM.CodeGeneration.dll')">
+      <HintPath>$(InteropDir)\ProjectM.CodeGeneration.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- VampireCommandFramework -->
+  <ItemGroup>
+    <Reference Include="VampireCommandFramework" Condition="Exists('$(DllsDir)\VampireCommandFramework.dll')">
+      <HintPath>$(DllsDir)\VampireCommandFramework.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- If external DLLs are missing locally (CI/IntelliSense), exclude files that require them so the project still builds. -->
+  <ItemGroup>
+    <Compile Remove="Dev\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(HasBepInEx)' != 'true' Or '$(HasInterop)' != 'true' Or '$(HasVCF)' != 'true' Or '$(HasCodeGen)' != 'true'">
+    <Compile Remove="BepInExPlugin.cs" />
+    <Compile Remove="Hooks\**\*.cs" />
+    <Compile Remove="Commands\**\*.cs" />
+    <Compile Remove="Services\**\*.cs" />
+  </ItemGroup>
+
+  <!-- Ensure Core DLL is copied to Plugin output -->
+  <Target Name="CopyCoreToPluginOutput" AfterTargets="Build">
+    <ItemGroup>
+      <CoreOutput Include="..\NightLadder.Core\bin\$(Configuration)\$(TargetFramework)\NightLadder.Core.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CoreOutput)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('..\\NightLadder.Core\\bin\\$(Configuration)\\$(TargetFramework)\\NightLadder.Core.dll')" />
+  </Target>
+
+  <!-- Deploy automático (opcional) -->
+  <Target Name="CopyToBepInExPlugins" AfterTargets="Build" Condition=" '$(DeployDir)' != '' ">
+    <Message Importance="high" Text="[NightLadder] Copiando DLLs para $(DeployDir)" />
+    <ItemGroup>
+      <DeployFiles Include="$(TargetDir)NightLadder.Plugin.dll" />
+      <DeployFiles Include="$(TargetDir)NightLadder.Core.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DeployFiles)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
